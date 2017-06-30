@@ -1,5 +1,5 @@
 # SWIFT: Predictive Fast Reroute
-For more information about SWIFT, please visit our [netaddr](https://swift.ethz.ch).
+For more information about SWIFT, please visit our [webiste](https://swift.ethz.ch).
 
 ## Try SWIFT
 
@@ -22,7 +22,7 @@ Several parameters can be configured to tune SWIFT:<br />
 --port            Port number swift listens to receive new BGP messages (Default 3000)<br />
 --win_size        Size of the sliding window (in second, default 10)<br />
 --start_stop        The start and stop thresholds, separated by a comma (default 1500,9)<br />
---min_burst_size        Minimum number of withdrawals to execute BPA (default 2500)<br />
+--min_burst_size        Minimum number of withdrawals to execute BPA (default 2500, :warning: the variable triggering thresgold based on the history model (see the paper), is not available in this repositery)<br />
 --bpa_freq        Frequency of BPA executions, until max 15000 withdrawals (default 2500)<br />
 --p_w            Weight of PS (default 1)<br />
 --r_w            Weight of WS (default 3)<br />
