@@ -1,5 +1,5 @@
 # SWIFT: Predictive Fast Reroute
-For more information about SWIFT, please visit our [webiste](https://swift.ethz.ch).
+For more information about SWIFT, please visit our [website](https://swift.ethz.ch).
 
 ## Try SWIFT
 
