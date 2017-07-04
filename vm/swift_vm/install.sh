@@ -28,37 +28,35 @@ tmux send -t mininext "sudo python /root/miniNExT/examples/swift/start.py" ENTER
 sleep 2
 echo '-- Virtual topology started!'
 
-if [[ "$1" == "swift" ]] || [[ "$1" == "noswift" ]]; then
+ovs-vsctl set-controller s1 tcp:127.0.0.1:6633
+ovs-vsctl set-fail-mode s1 secure
+ifconfig s1 2.0.0.4/24 up
 
-    ovs-vsctl set-controller s1 tcp:127.0.0.1:6633
-    ovs-vsctl set-fail-mode s1 secure
-    ifconfig s1 2.0.0.4/24 up
+sleep 1
 
-    sleep 1
+r2_port=`ovs-ofctl show s1 | grep r2-ovs | cut -f 1 -d '(' | tr -d ' '`
+r3_port=`ovs-ofctl show s1 | grep r3-ovs | cut -f 1 -d '(' | tr -d ' '`
+r4_port=`ovs-ofctl show s1 | grep r4-ovs | cut -f 1 -d '(' | tr -d ' '`
 
-    r2_port=`ovs-ofctl show s1 | grep r2-ovs | cut -f 1 -d '(' | tr -d ' '`
-    r3_port=`ovs-ofctl show s1 | grep r3-ovs | cut -f 1 -d '(' | tr -d ' '`
-    r4_port=`ovs-ofctl show s1 | grep r4-ovs | cut -f 1 -d '(' | tr -d ' '`
+echo '2.0.0.1   20:00:00:00:00:01   '$r2_port > /root/SWIFT/swift/main/mapping
+echo '2.0.0.2   20:00:00:00:00:02   '$r3_port >> /root/SWIFT/swift/main/mapping
+echo '2.0.0.3   20:00:00:00:00:03   '$r4_port >> /root/SWIFT/swift/main/mapping
 
-    echo '2.0.0.1   20:00:00:00:00:01   '$r2_port > /root/SWIFT/swift/main/mapping
-    echo '2.0.0.2   20:00:00:00:00:02   '$r3_port >> /root/SWIFT/swift/main/mapping
-    echo '2.0.0.3   20:00:00:00:00:03   '$r4_port >> /root/SWIFT/swift/main/mapping
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r2_port,actions=output:$r3_port,$r4_port,Controller
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r3_port,actions=output:$r2_port,$r4_port,Controller
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r4_port,actions=output:$r2_port,$r3_port,Controller
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=LOCAL,actions=output:$r2_port,$r3_port,$r4_port
 
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r2_port,actions=output:$r3_port,$r4_port,Controller
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r3_port,actions=output:$r2_port,$r4_port,Controller
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r4_port,actions=output:$r2_port,$r3_port,Controller
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=LOCAL,actions=output:$r2_port,$r3_port,$r4_port
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:01,actions=output:$r2_port
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:02,actions=output:$r3_port
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:03,actions=output:$r4_port
+sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:04,actions=output:LOCAL
 
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:01,actions=output:$r2_port
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:02,actions=output:$r3_port
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:03,actions=output:$r4_port
-    sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0800,dl_dst=20:00:00:00:00:04,actions=output:LOCAL
+ip link set dev s1 address 20:00:00:00:00:04
 
-    ip link set dev s1 address 20:00:00:00:00:04
+sleep 2
+echo '-- OVS ready!'
 
-    sleep 2
-    echo '-- OVS ready!'
-fi
 
 ./mx r6 '/root/bgpsimple/bgp_simple.pl -myip 6.0.0.2 -myas 60 -peerip 6.0.0.1 -peeras 50 -holdtime 1200 -keepalive 400 -p /root/bgpsimple/bgpdump/bview_200K &' 1> /root/.bgpsimple_r6_output
 
