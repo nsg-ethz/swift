@@ -16,7 +16,7 @@ from os import O_NONBLOCK, read
 
 swift_port = randint(3000,4000)
 
-process = subprocess.Popen("python /root/SWIFT/swift/main/swift.py --port "+str(swift_port)+' --silent --run_encoding_threshold 1000', \
+process = subprocess.Popen("python /root/SWIFT/swift/code/swift.py --port "+str(swift_port)+' --silent --run_encoding_threshold 1000', \
     shell=True, stdout=subprocess.PIPE, preexec_fn=os.setsid)
 time.sleep(2)
 
