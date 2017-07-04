@@ -71,3 +71,107 @@ SWIFT writes information about the bursts found. For each burst found, SWIFT wri
 ###### In the *log* directory
 
 SWIFT keeps track of some debugging information when running. It helps if you want to debug.
+
+
+## Try it out
+
+We have setup a VM where a SWIFTED router can be tested and compared to a non-SWIFTED router.
+In the VM are installed:
+* Mininet v2.1.0
+* MiniNExT
+* Openvswitch v2.0.2
+* Floodlight v1.1
+* ExaBGP v3.4
+* bgpsimple
+* nmap
+* Quagga
+When starting the VM, you first need to built the [Quagga](http://www.nongnu.org/quagga/)-based virtual network with [miniNExT](https://github.com/USC-NSL/miniNExT), setup the different
+components required for SWIFT, i.e., [openvswitch](https://github.com/openvswitch/ovs), [exabgp](https://github.com/Exa-Networks/exabgp) [floodlight](https://github.com/floodlight/floodlight), and advertise a large
+set of prefixes with [bgpsimple](https://github.com/KTrel/bgpsimple).
+Luckily, you can do all of this with just the following command:
+
+```
+./install.sh swift
+```
+
+If you want to try the non-SWIFTED solution, use the following command instead:
+
+```
+./install.sh noswift
+```
+
+The following figure describes the virtual network now running inside the VM if
+SWIFT is used. If SWIFT is disabled, the OVS switch acts as a normal L2 switch,
+and there is an eBGP session between AS2-AS3 and AS2-AS4.
+
+![Alt text](https://github.com/nsg-ethz/SWIFT/blob/master/swift/lab/setup/setup.001.jpeg?raw=true "VM setup")
+
+Each AS is a quagga router running in a Linux namespace. To access a router, you first
+need to go the right namespace with *mx*. Then use *vtysh* to access the CLI of the router.
+Example to access router R2:
+
+```
+./mx r2
+vtysh
+```
+
+Once in the quagga CLI, feel free to look at the BGP information and the BGP routes.
+Example:
+
+```
+R2# sh ip bgp summary
+R2# sh ip bgp
+```
+
+When R2 has received the 200K routes (this can take few minutes, in particular
+when you enable SWIFT), you can see the virtual next-hop advertised by
+the SWIFT controller. When pinging one of the destination, this virtual IP next-hop
+is translated into a virtual MAC address with ARP and our ARP handler running by Floodlight.
+
+When going back to the main namespace (with *exit*, two times if you are in the quagga CLI),
+you can see the Openflow rules installed the OVS switch. Simply run the following command:
+
+```
+ovs-ofctl dump-flows s1
+```
+
+The rules with a priority equal to 1000 are here to insure the normal L2 forwarding.
+The rules with a priority equal to 10 are the primary rules inserted by SWIFT.
+When triggering the fast-reroute process, the backup rules will be inserted by SWIFT so as
+to fast reroute the affected traffic towards the right backup next-hops. Those backup
+rules will have a priority of 100.
+
+### Measure the convergence time
+
+To measure the SWIFT convergence time, you first need to start ping measurements
+from R1 towards R6.
+
+```
+./mx r1
+nping --dest-ip 109.207.108.1 -H --rate 10 -c 10000
+```
+
+For clarity, this only shows the ping responses.
+To simulate a remote failure, we will cut the link between R3 and R5.
+
+```
+./mx r3
+ifconfig r5 down
+```
+
+At this point, the withdrawals start to be propagated and SWIFT will trigger the
+fast reroute process! The convergence time is the maximum delay between two ping
+responses. Example:
+
+```
+RCVD (6.4138s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=13615 seq=65] IP [ttl=61 id=64351 iplen=28 ]
+RCVD (6.6174s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=13615 seq=65] IP [ttl=61 id=64353 iplen=28 ]
+RCVD (6.6174s) ICMP [2.0.0.2 > 1.0.0.2 Network 109.207.108.1 unreachable (type=3/code=0) ] IP [ttl=63 id=23156 iplen=56 ]
+RCVD (6.8174s) ICMP [2.0.0.2 > 1.0.0.2 Network 109.207.108.1 unreachable (type=3/code=0) ] IP [ttl=63 id=23179 iplen=56 ]
+RCVD (7.6186s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=13615 seq=76] IP [ttl=61 id=64539 iplen=28 ]
+RCVD (7.8182s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=13615 seq=77] IP [ttl=61 id=64559 iplen=28 ]
+```
+
+In this case, the convergence time is around 1 second.
+You can do the same experiment with the non-SWIFTED router, and see the convergence
+time difference.
