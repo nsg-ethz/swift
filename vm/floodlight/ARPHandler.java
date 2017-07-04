@@ -59,7 +59,7 @@ public class ARPHandler implements IOFMessageListener, IFloodlightModule {
     protected static Logger logger;
 
     // File where to find the mapping virtual IP to virtual MAC
-    private String vnh_file = "/root/SWIFT/swift/main/virtual_nexthops";
+    private String vnh_file = "/root/SWIFT/swift/code/virtual_nexthops";
 
     /**
      * This method performs the mapping Virtual IP to virtual MAC
