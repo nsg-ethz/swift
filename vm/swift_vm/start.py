@@ -24,8 +24,7 @@ from mininext.cli import CLI
 from mininext.net import MiniNExT
 from mininet.link import Link, TCLink
 
-
-from topo import QuaggaTopo, QuaggaP4Topo
+from topo import QuaggaTopo
 
 net = None
 
