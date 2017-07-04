@@ -1,14 +1,17 @@
 #!/bin/bash
 
 if [ $# -ne 1 ]; then
-    echo $0: usage ./install.sh [swift/noswift/noswiftp4]
+    echo $0: usage ./install.sh [swift/noswift]
     exit 1
 fi
 
+cp -r ~/SWIFT/swift/vm/swift_vm/start.py ~/miniNExT/examples/swift/
+cp -r ~/SWIFT/swift/vm/swift_vm/topo.py ~/miniNExT/examples/swift/
+
 if [ "$1" == "swift" ]
-    then cp -r ~/SWIFT/swift/lab/quagga_config/configs_swift/* ~/miniNExT/examples/swift/configs/
-elif [[ "$1" == "noswift" ]] || [[ "$1" == "noswiftp4" ]]
-    then cp -r ~/SWIFT/swift/lab/quagga_config/configs_noswift/* ~/miniNExT/examples/swift/configs/
+    then cp -r ~/SWIFT/swift/vm/quagga_config/configs_swift/* ~/miniNExT/examples/swift/configs/
+elif [ "$1" == "noswift" ]
+    then cp -r ~/SWIFT/swift/vm/quagga_config/configs_noswift/* ~/miniNExT/examples/swift/configs/
 else
     echo $0: usage ./install.sh [swift/noswift]
 fi
@@ -20,11 +23,7 @@ killall ovs-controller > /dev/null 2>&1
 tmux kill-session -t mininext &> /dev/null
 tmux new-session -d -s mininext
 
-if [ "$1" == "noswiftp4" ]
-    then tmux send -t mininext "sudo python /root/miniNExT/examples/swift/start.py --sw_path /root/behavioral-model/targets/simple_switch/simple_switch --json_path /root/SWIFT/swift/lab/p4/swift.json" ENTER
-else
-    tmux send -t mininext "sudo python /root/miniNExT/examples/swift/start.py" ENTER
-fi
+tmux send -t mininext "sudo python /root/miniNExT/examples/swift/start.py" ENTER
 
 sleep 2
 echo '-- Virtual topology started!'
@@ -78,7 +77,7 @@ then
     tmux kill-session -t exabgp &> /dev/null
     ./.kill_exabgp.sh &> /dev/null
     tmux new-session -d -s exabgp
-    tmux send -t exabgp 'env exabgp.tcp.bind="127.0.0.1" exabgp.tcp.port=179 exabgp.daemon.drop=false exabgp.log.level=WARNING ~/exabgp/sbin/exabgp ~/SWIFT/swift/lab/exabgp/exabgp-rs.conf
+    tmux send -t exabgp 'env exabgp.tcp.bind="127.0.0.1" exabgp.tcp.port=179 exabgp.daemon.drop=false exabgp.log.level=WARNING ~/exabgp/sbin/exabgp ~/SWIFT/swift/vm/exabgp/exabgp-rs.conf
     ' ENTER
 
     echo '-- EXABGP started! [for SWIFT]'

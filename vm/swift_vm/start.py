@@ -24,29 +24,22 @@ from mininext.cli import CLI
 from mininext.net import MiniNExT
 from mininet.link import Link, TCLink
 
-from p4_mininet.p4_mininet import P4Switch, P4Host
-
 
 from topo import QuaggaTopo, QuaggaP4Topo
 
 net = None
 
 
-def startNetwork(sw_path=None, json_path=None):
+def startNetwork():
     "instantiates a topo, then starts the network and prints debug information"
 
     info('** Creating Quagga network topology\n')
-    if sw_path == None and json_path == None:
-        topo = QuaggaTopo()
-    else:
-        topo = QuaggaP4Topo(sw_path, json_path)
+    topo = QuaggaTopo()
+
 
     info('** Starting the network\n')
     global net
-    if sw_path == None and json_path == None:
-        net = MiniNExT(topo, controller=None)
-    else:
-        net = MiniNExT(topo, controller=None, switch=P4Switch)
+    net = MiniNExT(topo, controller=None)
 
     info('** Adding the controller\n')
     # Adding the remote controller
@@ -122,19 +115,9 @@ def stopNetwork():
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser("Run MiniMExT with P4 targets.")
-    parser.add_argument("--sw_path", type=str, default=None, help="Path where to find the switch target.")
-    parser.add_argument("--json_path", type=str, default=None, help="Path where to find the json P4 program.")
-    args = parser.parse_args()
-    sw_path = args.sw_path
-    json_path = args.json_path
-
-    print sw_path
-    print json_path
-
     # Force cleanup on exit by registering a cleanup function
     atexit.register(stopNetwork)
 
     # Tell mininet to print useful information
     setLogLevel('info')
-    startNetwork(sw_path, json_path)
+    startNetwork()
