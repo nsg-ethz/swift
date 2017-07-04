@@ -38,9 +38,9 @@ r2_port=`ovs-ofctl show s1 | grep r2-ovs | cut -f 1 -d '(' | tr -d ' '`
 r3_port=`ovs-ofctl show s1 | grep r3-ovs | cut -f 1 -d '(' | tr -d ' '`
 r4_port=`ovs-ofctl show s1 | grep r4-ovs | cut -f 1 -d '(' | tr -d ' '`
 
-echo '2.0.0.1   20:00:00:00:00:01   '$r2_port > /root/SWIFT/swift/main/mapping
-echo '2.0.0.2   20:00:00:00:00:02   '$r3_port >> /root/SWIFT/swift/main/mapping
-echo '2.0.0.3   20:00:00:00:00:03   '$r4_port >> /root/SWIFT/swift/main/mapping
+echo '2.0.0.1   20:00:00:00:00:01   '$r2_port > /root/SWIFT/swift/code/mapping
+echo '2.0.0.2   20:00:00:00:00:02   '$r3_port >> /root/SWIFT/swift/code/mapping
+echo '2.0.0.3   20:00:00:00:00:03   '$r4_port >> /root/SWIFT/swift/code/mapping
 
 sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r2_port,actions=output:$r3_port,$r4_port,Controller
 sudo ovs-ofctl add-flow s1 priority=1000,dl_type=0x0806,in_port=$r3_port,actions=output:$r2_port,$r4_port,Controller
