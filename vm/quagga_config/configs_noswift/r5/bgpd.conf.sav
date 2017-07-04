@@ -1,0 +1,15 @@
+!
+! Zebra configuration saved from vty
+!   2016/10/11 06:32:00
+!
+log file /var/log/quagga/bgpd.log
+!
+router bgp 50
+ bgp router-id 10.0.5.1
+ network 6.0.0.0/24
+ neighbor 4.0.0.1 remote-as 30
+ neighbor 5.0.0.1 remote-as 40
+ neighbor 6.0.0.2 remote-as 60
+!
+line vty
+!

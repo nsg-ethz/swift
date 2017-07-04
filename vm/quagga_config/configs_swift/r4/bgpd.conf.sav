@@ -1,0 +1,23 @@
+!
+! Zebra configuration saved from vty
+!   2016/10/14 18:18:01
+!
+log file /var/log/quagga/bgpd.log
+!
+router bgp 40
+ bgp router-id 10.0.4.1
+ network 2.0.0.0/24
+ network 5.0.0.0/24
+ neighbor 2.0.0.4 remote-as 65000
+ neighbor 2.0.0.4 route-map REJECT in
+ neighbor 2.0.0.4 route-map PREPEND out
+ neighbor 5.0.0.2 remote-as 50
+!
+route-map PREPEND permit 10
+ set as-path prepend 40 40
+!
+route-map REJECT deny 10
+ match peer 2.0.0.4
+!
+line vty
+!

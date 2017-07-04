@@ -1,0 +1,16 @@
+!
+! Zebra configuration saved from vty
+!   2016/10/10 22:29:58
+!
+!
+interface lo
+!
+interface r5
+ ip address 6.0.0.2/24
+ ipv6 nd suppress-ra
+!
+ip forwarding
+!
+!
+line vty
+!

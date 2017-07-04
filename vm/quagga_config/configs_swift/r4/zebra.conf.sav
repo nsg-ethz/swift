@@ -1,0 +1,24 @@
+!
+! Zebra configuration saved from vty
+!   2016/10/14 18:18:01
+!
+!
+interface lo
+!
+interface r5
+ ip address 5.0.0.1/24
+ ipv6 nd suppress-ra
+!
+interface s1
+ ip address 2.0.0.3/24
+ ipv6 nd suppress-ra
+!
+route-map PREPEND permit 10
+!
+route-map REJECT deny 10
+!
+ip forwarding
+!
+!
+line vty
+!
