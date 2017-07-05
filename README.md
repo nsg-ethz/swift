@@ -22,14 +22,14 @@ Several parameters can be configured to tune SWIFT:<br />
 --port            Port number swift listens to receive new BGP messages (Default 3000)<br />
 --win_size        Size of the sliding window (in second, default 10)<br />
 --start_stop        The start and stop thresholds, separated by a comma (default 1500,9)<br />
---min_burst_size        Minimum number of withdrawals to execute BPA (default 2500, :warning: the variable triggering thresgold based on the history model (see the paper), is not available in this repositery)<br />
---bpa_freq        Frequency of BPA executions, until max 15000 withdrawals (default 2500)<br />
+--min_burst_size        Minimum number of withdrawals to execute the inference algorithm (default 2500, :warning: the variable triggering thresgold based on the history model (see the paper), is not available in this repositery)<br />
+--bpa_freq        Frequency of the inference executions, until max 15000 withdrawals (default 2500, use a very high number to just execute the inference algorithm one time)<br />
 --p_w            Weight of PS (default 1)<br />
 --r_w            Weight of WS (default 3)<br />
 --bpa_algo        Algorithm to use (default bpa-multiple, can also be bpa-single or naive)<br />
 --nb_bits_aspath    Number of bits reserved for the aspath compression (default 28)<br />
 --nb_bits_nexthop    Number of bits reserved for each nexthop (default 3)<br />
---no_rib	Do not play the global RIB. Avoid unecessary processing, if you just need BPA results.
+--no_rib	Do not play the global RIB. Avoid unecessary processing, if you just need the inference results.
 --silent    Silent mode. Use when you want to speed-up SWIFT. There is no debug though.
 
 #### Feed SWIFT
@@ -73,7 +73,7 @@ SWIFT writes information about the bursts found. For each burst found, SWIFT wri
 SWIFT keeps track of some debugging information when running. It helps if you want to debug.
 
 
-## Try it out
+## Try it out!
 
 We have setup a VM where a SWIFTED router can be tested and compared to a non-SWIFTED router.
 In the VM are installed:
@@ -85,6 +85,7 @@ In the VM are installed:
 * bgpsimple
 * nmap
 * Quagga
+
 We have configured SSH port forwarding on the VM. You can access the VM with
 the following command:
 ```
