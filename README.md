@@ -93,7 +93,7 @@ ssh -p 2222 root@localhost
 ```
 Always use root for the login.
 When starting the VM, you first need to built the [Quagga](http://www.nongnu.org/quagga/)-based virtual network with [miniNExT](https://github.com/USC-NSL/miniNExT), setup the different
-components required for SWIFT, i.e., [openvswitch](https://github.com/openvswitch/ovs), [exabgp](https://github.com/Exa-Networks/exabgp) [floodlight](https://github.com/floodlight/floodlight), and advertise a large
+components required for SWIFT, i.e., [openvswitch](https://github.com/openvswitch/ovs), [exabgp](https://github.com/Exa-Networks/exabgp), [floodlight](https://github.com/floodlight/floodlight), and advertise a large
 set of prefixes with [bgpsimple](https://github.com/KTrel/bgpsimple).
 Luckily, you can do all of this with just the following command:
 
