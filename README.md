@@ -73,7 +73,7 @@ SWIFT writes information about the bursts found. For each burst found, SWIFT wri
 SWIFT keeps track of some debugging information when running. It helps if you want to debug.
 
 
-## See SWIFT in action!
+## SWIFT in action!
 
 We have setup a VM where a SWIFTED router can be tested and compared to a non-SWIFTED router.
 In the VM are installed:
