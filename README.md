@@ -85,6 +85,12 @@ In the VM are installed:
 * bgpsimple
 * nmap
 * Quagga
+We have configured SSH port forwarding on the VM. You can access the VM with
+the following command:
+```
+ssh -p 2222 root@localhost
+```
+Always use root for the login.
 When starting the VM, you first need to built the [Quagga](http://www.nongnu.org/quagga/)-based virtual network with [miniNExT](https://github.com/USC-NSL/miniNExT), setup the different
 components required for SWIFT, i.e., [openvswitch](https://github.com/openvswitch/ovs), [exabgp](https://github.com/Exa-Networks/exabgp) [floodlight](https://github.com/floodlight/floodlight), and advertise a large
 set of prefixes with [bgpsimple](https://github.com/KTrel/bgpsimple).
@@ -124,7 +130,7 @@ R2# sh ip bgp summary
 R2# sh ip bgp
 ```
 
-When R2 has received the 200K routes (this can take few minutes, in particular
+When R2 has received about ~218K routes (this can take few minutes, in particular
 when you enable SWIFT), you can see the virtual next-hop advertised by
 the SWIFT controller. When pinging one of the destination, this virtual IP next-hop
 is translated into a virtual MAC address with ARP and our ARP handler running by Floodlight.
@@ -136,7 +142,7 @@ you can see the Openflow rules installed the OVS switch. Simply run the followin
 ovs-ofctl dump-flows s1
 ```
 
-The rules with a priority equal to 1000 are here to insure the normal L2 forwarding.
+The rules with a priority equal to 1000 are here to enable the normal L2 forwarding.
 The rules with a priority equal to 10 are the primary rules inserted by SWIFT.
 When triggering the fast-reroute process, the backup rules will be inserted by SWIFT so as
 to fast reroute the affected traffic towards the right backup next-hops. Those backup
@@ -174,5 +180,13 @@ RCVD (7.8182s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=13615
 ```
 
 In this case, the convergence time is around 1 second.
-You can do the same experiment with the non-SWIFTED router, and see the convergence
-time difference.
+With a non-SWIFTED we measured a convergence of about 5 seconds:
+
+```
+RCVD (13.2215s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=5697 seq=132] IP [ttl=61 id=41721 iplen=28 ]
+RCVD (13.4212s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=5697 seq=132] IP [ttl=61 id=41732 iplen=28 ]
+RCVD (13.4212s) ICMP [2.0.0.2 > 1.0.0.2 Network 109.207.108.1 unreachable (type=3/code=0) ] IP [ttl=63 id=47646 iplen=56 ]
+RCVD (13.6212s) ICMP [2.0.0.2 > 1.0.0.2 Network 109.207.108.1 unreachable (type=3/code=0) ] IP [ttl=63 id=47658 iplen=56 ]
+RCVD (18.6379s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=5697 seq=185] IP [ttl=61 id=42355 iplen=28 ]
+RCVD (18.8377s) ICMP [109.207.108.1 > 1.0.0.2 Echo reply (type=0/code=0) id=5697 seq=186] IP [ttl=61 id=42363 iplen=28 ]
+```
