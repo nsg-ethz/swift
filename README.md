@@ -104,7 +104,8 @@ The following figure describes the virtual network now running inside the VM if
 SWIFT is used. If SWIFT is disabled, the OVS switch acts as a normal L2 switch,
 and there is an eBGP session between AS2-AS3 and AS2-AS4.
 
-![Alt text](https://github.com/nsg-ethz/SWIFT/blob/master/swift/lab/setup/setup.001.jpeg?raw=true "VM setup")
+![Alt text](https://github.com/nsg-ethz/swift/blob/master/vm/setup/setup.001.jpeg?raw=true "VM setup")
+
 
 Each AS is a quagga router running in a Linux namespace. To access a router, you first
 need to go the right namespace with *mx*. Then use *vtysh* to access the CLI of the router.
